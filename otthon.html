@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Otthon">
+<title>Otthon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F5F0;
+  --surface: #FFFFFF;
+  --surface2: #F0EDE6;
+  --text: #1A1814;
+  --text2: #6B6760;
+  --text3: #A09D98;
+  --border: rgba(0,0,0,0.08);
+  --green: #3B6D11;
+  --green-bg: #EAF3DE;
+  --green-mid: #639922;
+  --amber: #854F0B;
+  --amber-bg: #FAEEDA;
+  --amber-mid: #BA7517;
+  --red: #A32D2D;
+  --red-bg: #FCEBEB;
+  --red-mid: #E24B4A;
+  --blue: #185FA5;
+  --blue-bg: #E6F1FB;
+  --blue-mid: #378ADD;
+  --teal: #0F6E56;
+  --teal-bg: #E1F5EE;
+  --teal-mid: #1D9E75;
+  --purple: #534AB7;
+  --purple-bg: #EEEDFE;
+  --purple-mid: #7F77DD;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --tab-h: 72px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100dvh; overflow-x: hidden; }
+.screen { display: none; flex-direction: column; min-height: 100dvh; padding-bottom: calc(var(--tab-h) + 8px); }
+.screen.active { display: flex; }
+.header { padding: 52px 20px 16px; }
+.header h1 { font-family: 'DM Serif Display', serif; font-size: 28px; font-weight: 400; color: var(--text); }
+.header p { font-size: 13px; color: var(--text3); margin-top: 2px; }
+.content { flex: 1; padding: 0 16px; }
+
+/* TABS */
+.tabs { position: fixed; bottom: 0; left: 0; right: 0; height: var(--tab-h); background: rgba(255,255,255,0.92); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 0.5px solid var(--border); display: flex; z-index: 100; padding-bottom: env(safe-area-inset-bottom); }
+.tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; cursor: pointer; color: var(--text3); transition: color 0.2s; font-size: 10px; font-weight: 500; letter-spacing: 0.3px; }
+.tab.active { color: var(--text); }
+.tab svg { width: 22px; height: 22px; stroke-width: 1.8; fill: none; stroke: currentColor; transition: transform 0.2s; }
+.tab.active svg { transform: scale(1.1); }
+
+/* CARDS */
+.card { background: var(--surface); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); border: 0.5px solid var(--border); }
+.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.card-title { font-size: 13px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; }
+.card-value { font-family: 'DM Serif Display', serif; font-size: 32px; color: var(--text); }
+.card-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+.badge { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; }
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-amber { background: var(--amber-bg); color: var(--amber); }
+.badge-red { background: var(--red-bg); color: var(--red); }
+.badge-blue { background: var(--blue-bg); color: var(--blue); }
+.badge-purple { background: var(--purple-bg); color: var(--purple); }
+.badge-teal { background: var(--teal-bg); color: var(--teal); }
+
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer; border: none; transition: all 0.15s; }
+.btn-primary { background: var(--text); color: #fff; }
+.btn-primary:active { transform: scale(0.97); }
+.btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+.btn-block { width: 100%; justify-content: center; margin-bottom: 10px; }
+.btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+.btn-danger { background: var(--red-bg); color: var(--red); }
+.btn-success { background: var(--green-bg); color: var(--green); }
+.btn-icon { width: 36px; height: 36px; padding: 0; justify-content: center; align-items: center; border-radius: 10px; background: var(--surface2); border: none; color: var(--text2); cursor: pointer; font-size: 18px; }
+
+/* FORM */
+.form-group { margin-bottom: 14px; }
+.form-label { font-size: 12px; font-weight: 500; color: var(--text2); margin-bottom: 6px; display: block; letter-spacing: 0.3px; }
+.form-input { width: 100%; padding: 11px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; background: var(--surface); color: var(--text); outline: none; -webkit-appearance: none; }
+.form-input:focus { border-color: var(--text3); }
+.form-select { width: 100%; padding: 11px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 15px; background: var(--surface); color: var(--text); outline: none; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236B6760' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* LIST ITEMS */
+.list-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
+.list-item:last-child { border-bottom: none; }
+.item-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.item-body { flex: 1; min-width: 0; }
+.item-title { font-size: 15px; font-weight: 400; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item-title.done { text-decoration: line-through; color: var(--text3); }
+.item-sub { font-size: 12px; color: var(--text3); margin-top: 1px; }
+.item-actions { display: flex; gap: 6px; flex-shrink: 0; }
+.check-btn { width: 28px; height: 28px; border-radius: 8px; border: 1.5px solid var(--border); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-size: 14px; }
+.check-btn.checked { background: var(--green-bg); border-color: var(--green-mid); }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; display: none; align-items: flex-end; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--surface); border-radius: 24px 24px 0 0; padding: 24px 20px; padding-bottom: calc(24px + env(safe-area-inset-bottom)); width: 100%; max-height: 90dvh; overflow-y: auto; animation: slideUp 0.3s ease; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 20px; }
+.modal-title { font-family: 'DM Serif Display', serif; font-size: 22px; margin-bottom: 20px; }
+
+/* CALENDAR */
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+.cal-day-name { font-size: 11px; color: var(--text3); text-align: center; padding: 4px 0; font-weight: 500; }
+.cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 10px; cursor: pointer; font-size: 14px; color: var(--text2); position: relative; }
+.cal-day.today { background: var(--text); color: #fff; font-weight: 500; }
+.cal-day.has-event::after { content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; border-radius: 50%; background: var(--amber-mid); }
+.cal-day.today.has-event::after { background: #fff; }
+.cal-day.other-month { color: var(--text3); opacity: 0.4; }
+.cal-day.selected { background: var(--blue-bg); color: var(--blue); }
+.cal-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.cal-nav-title { font-family: 'DM Serif Display', serif; font-size: 18px; }
+
+/* PÉNZ */
+.money-bar { height: 8px; border-radius: 4px; background: var(--surface2); overflow: hidden; margin: 10px 0; }
+.money-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--green-mid), var(--teal-mid)); transition: width 0.5s ease; }
+.stat-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.stat-label { font-size: 13px; color: var(--text2); }
+.stat-val { font-size: 13px; font-weight: 500; color: var(--text); }
+
+/* VIRÁG */
+.plant-card { background: var(--teal-bg); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; display: flex; align-items: center; gap: 12px; border: 0.5px solid rgba(29,158,117,0.2); }
+.plant-icon { font-size: 28px; }
+.plant-body { flex: 1; }
+.plant-name { font-size: 15px; font-weight: 500; color: var(--teal); }
+.plant-next { font-size: 12px; color: var(--teal); opacity: 0.75; }
+.plant-water-btn { padding: 7px 14px; border-radius: 8px; background: var(--teal); color: #fff; border: none; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; }
+.plant-overdue { background: var(--amber-bg); border-color: rgba(186,117,23,0.2); }
+.plant-overdue .plant-name, .plant-overdue .plant-next { color: var(--amber); }
+.plant-overdue .plant-water-btn { background: var(--amber-mid); }
+
+/* ÜVEG */
+.bottle-row { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; margin: 10px 0; }
+.bottle { font-size: 22px; cursor: pointer; transition: transform 0.1s; }
+.bottle:active { transform: scale(0.85); }
+.bottle.collected { opacity: 0.3; }
+
+/* CHIP */
+.chip-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.chip { padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; cursor: pointer; border: 1.5px solid transparent; transition: all 0.15s; }
+.chip.active { background: var(--text); color: #fff; }
+.chip.inactive { background: var(--surface2); color: var(--text2); }
+
+/* MEMBER AVATAR */
+.avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+
+/* FAB */
+.fab { position: fixed; bottom: calc(var(--tab-h) + 16px); right: 20px; width: 54px; height: 54px; border-radius: 50%; background: var(--text); color: #fff; border: none; font-size: 26px; cursor: pointer; box-shadow: 0 4px 20px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; z-index: 90; transition: transform 0.15s; }
+.fab:active { transform: scale(0.92); }
+
+/* TOAST */
+.toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%); background: var(--text); color: #fff; padding: 10px 20px; border-radius: 20px; font-size: 14px; z-index: 300; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
+.toast.show { opacity: 1; }
+
+/* PROGRESS RING */
+.progress-section { display: flex; align-items: center; gap: 16px; }
+.ring { transform: rotate(-90deg); }
+</style>
+</head>
+<body>
+
+<!-- FŐOLDAL -->
+<div class="screen active" id="screen-home">
+  <div class="header">
+    <h1>Jó napot! 🏡</h1>
+    <p id="home-date"></p>
+  </div>
+  <div class="content">
+    <!-- Pénz összefoglaló -->
+    <div class="card" onclick="showScreen('penz')">
+      <div class="card-header">
+        <span class="card-title">💰 Spórolt pénz</span>
+        <span class="badge badge-green" id="home-savings-badge">0 Ft</span>
+      </div>
+      <div class="card-value" id="home-savings">0 Ft</div>
+      <div class="money-bar"><div class="money-bar-fill" id="home-savings-bar" style="width:0%"></div></div>
+      <div class="card-sub" id="home-savings-goal">Cél: 100 000 Ft</div>
+    </div>
+
+    <!-- Mai feladatok -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">📋 Mai feladatok</span>
+        <span class="badge badge-amber" id="home-tasks-badge">0 db</span>
+      </div>
+      <div id="home-tasks-list"><p style="color:var(--text3);font-size:13px">Nincs mai feladat 🎉</p></div>
+    </div>
+
+    <!-- Virágok -->
+    <div class="card" onclick="showScreen('virag')">
+      <div class="card-header">
+        <span class="card-title">🌿 Virágok</span>
+        <span class="badge badge-teal" id="home-plants-badge">0 öntözendő</span>
+      </div>
+      <div id="home-plants-preview" style="font-size:13px;color:var(--text3)">Nincs öntözendő virág</div>
+    </div>
+
+    <!-- Üvegek -->
+    <div class="card" onclick="showScreen('uveg')">
+      <div class="card-header">
+        <span class="card-title">🍾 Visszaváltandó</span>
+        <span class="badge badge-purple" id="home-bottles-badge">0 db</span>
+      </div>
+      <div id="home-bottles-val" style="font-size:13px;color:var(--text3)">0 Ft várható visszaváltás</div>
+    </div>
+  </div>
+</div>
+
+<!-- PÉNZ -->
+<div class="screen" id="screen-penz">
+  <div class="header">
+    <h1>Spórolt pénz 💰</h1>
+    <p>Megtakarítások követése</p>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:10px">Összesen spórolva</div>
+      <div class="card-value" id="total-savings">0 Ft</div>
+      <div class="money-bar"><div class="money-bar-fill" id="savings-bar" style="width:0%"></div></div>
+      <div class="stat-row" style="margin-top:8px">
+        <span class="stat-label">Cél</span>
+        <span class="stat-val" id="savings-goal-label">100 000 Ft</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Még szükséges</span>
+        <span class="stat-val" id="savings-remaining">100 000 Ft</span>
+      </div>
+    </div>
+
+    <div class="form-row" style="margin-bottom:12px">
+      <div>
+        <label class="form-label">Összeg (Ft)</label>
+        <input class="form-input" type="number" id="savings-amount" placeholder="pl. 5000" inputmode="numeric">
+      </div>
+      <div>
+        <label class="form-label">Megjegyzés</label>
+        <input class="form-input" type="text" id="savings-note" placeholder="pl. Ebéd">
+      </div>
+    </div>
+    <div class="form-row" style="margin-bottom:14px">
+      <button class="btn btn-primary" onclick="addSaving(1)" style="width:100%;justify-content:center">+ Hozzáadom</button>
+      <button class="btn btn-danger btn-sm" onclick="addSaving(-1)" style="width:100%;justify-content:center">− Kiveszem</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Cél összeg (Ft)</label>
+      <div style="display:flex;gap:8px">
+        <input class="form-input" type="number" id="savings-goal-input" placeholder="100000" inputmode="numeric" style="flex:1">
+        <button class="btn btn-outline" onclick="setSavingsGoal()">OK</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:12px">Tranzakciók</div>
+      <div id="savings-history"></div>
+    </div>
+  </div>
+</div>
+
+<!-- BEVÁSÁRLÓ -->
+<div class="screen" id="screen-bevasarlas">
+  <div class="header">
+    <h1>Bevásárló lista 🛒</h1>
+    <p id="shop-count">0 tétel</p>
+  </div>
+  <div class="content">
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <input class="form-input" style="flex:1" type="text" id="shop-input" placeholder="Adj hozzá terméket..." onkeydown="if(event.key==='Enter')addShopItem()">
+      <input class="form-input" style="width:80px" type="text" id="shop-qty" placeholder="db/kg" value="1 db">
+      <button class="btn btn-primary" onclick="addShopItem()">+</button>
+    </div>
+    <div class="chip-row">
+      <span class="chip active" onclick="filterShop('all',this)">Mind</span>
+      <span class="chip inactive" onclick="filterShop('active',this)">Aktív</span>
+      <span class="chip inactive" onclick="filterShop('done',this)">Kész</span>
+    </div>
+    <div id="shop-list"></div>
+    <button class="btn btn-danger btn-block" onclick="clearDoneShop()" style="margin-top:8px">Kész elemek törlése</button>
+  </div>
+</div>
+
+<!-- FELADATOK / NAPTÁR -->
+<div class="screen" id="screen-feladatok">
+  <div class="header">
+    <h1>Feladatok 📅</h1>
+  </div>
+  <div class="content">
+    <!-- Naptár -->
+    <div class="card">
+      <div class="cal-nav">
+        <button class="btn-icon" onclick="calNav(-1)">‹</button>
+        <div class="cal-nav-title" id="cal-title"></div>
+        <button class="btn-icon" onclick="calNav(1)">›</button>
+      </div>
+      <div class="cal-grid" id="cal-names"></div>
+      <div class="cal-grid" id="cal-days" style="margin-top:4px"></div>
+    </div>
+
+    <!-- Tagok szűrő -->
+    <div class="chip-row" id="member-filter"></div>
+
+    <!-- Feladat lista -->
+    <div id="task-list"></div>
+  </div>
+  <button class="fab" onclick="openTaskModal()">+</button>
+</div>
+
+<!-- TAKARÍTÁS -->
+<div class="screen" id="screen-takaritas">
+  <div class="header">
+    <h1>Takarítás 🧹</h1>
+    <p>Ki mit csinál</p>
+  </div>
+  <div class="content">
+    <div class="chip-row" id="clean-member-filter"></div>
+    <div id="clean-list"></div>
+  </div>
+  <button class="fab" onclick="openCleanModal()">+</button>
+</div>
+
+<!-- VIRÁG -->
+<div class="screen" id="screen-virag">
+  <div class="header">
+    <h1>Virágok 🌿</h1>
+    <p>Öntözési naptár</p>
+  </div>
+  <div class="content">
+    <div id="plant-list"></div>
+    <button class="btn btn-primary btn-block" onclick="openPlantModal()">+ Új virág hozzáadása</button>
+  </div>
+</div>
+
+<!-- ÜVEG -->
+<div class="screen" id="screen-uveg">
+  <div class="header">
+    <h1>Visszaváltandó 🍾</h1>
+    <p>Üvegek és kannák</p>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-value" id="bottle-total-val">0 Ft</div>
+          <div class="card-sub" id="bottle-count-label">0 db üveg</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:13px;color:var(--text2)">Visszaváltva eddig</div>
+          <div style="font-size:18px;font-weight:500;color:var(--green)" id="bottle-redeemed">0 Ft</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row" style="margin-bottom:12px">
+      <div>
+        <label class="form-label">Típus</label>
+        <select class="form-select" id="bottle-type">
+          <option value="50">Kis üveg (50 Ft)</option>
+          <option value="100">Nagy üveg (100 Ft)</option>
+          <option value="50">Kanna (50 Ft)</option>
+          <option value="30">Műanyag (30 Ft)</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Darab</label>
+        <input class="form-input" type="number" id="bottle-qty" value="1" min="1" inputmode="numeric">
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="addBottles()">+ Hozzáadom</button>
+
+    <div class="card" style="margin-top:14px">
+      <div class="card-title" style="margin-bottom:12px">Visszaváltandó tételek</div>
+      <div id="bottle-list"></div>
+    </div>
+
+    <button class="btn btn-success btn-block" onclick="redeemAll()" style="margin-top:4px">✓ Mind visszaváltva</button>
+  </div>
+</div>
+
+<!-- BOTTOM TABS -->
+<nav class="tabs">
+  <div class="tab active" onclick="showScreen('home')">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Főoldal
+  </div>
+  <div class="tab" onclick="showScreen('penz')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M8 10h8M8 14h8" stroke-linecap="round"/></svg>
+    Pénz
+  </div>
+  <div class="tab" onclick="showScreen('bevasarlas')">
+    <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+    Bevásárlás
+  </div>
+  <div class="tab" onclick="showScreen('feladatok')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Naptár
+  </div>
+  <div class="tab" onclick="showScreen('takaritas')">
+    <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round"/></svg>
+    Takarítás
+  </div>
+  <div class="tab" onclick="showScreen('virag')">
+    <svg viewBox="0 0 24 24"><path d="M12 22V12M12 12C12 12 7 10 7 6a5 5 0 0 1 10 0c0 4-5 6-5 6z"/><path d="M12 12C12 12 17 10 17 6"/></svg>
+    Virág
+  </div>
+  <div class="tab" onclick="showScreen('uveg')">
+    <svg viewBox="0 0 24 24"><path d="M8 2h8M9 2v6l-2 4v8a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-8l-2-4V2"/><line x1="7" y1="14" x2="17" y2="14"/></svg>
+    Üvegek
+  </div>
+</nav>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-task">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Új feladat</div>
+    <div class="form-group">
+      <label class="form-label">Feladat neve</label>
+      <input class="form-input" id="task-name" type="text" placeholder="pl. Ablak mosás">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Felelős</label>
+      <select class="form-select" id="task-member"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Dátum</label>
+        <input class="form-input" id="task-date" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Kategória</label>
+        <select class="form-select" id="task-cat">
+          <option>🧹 Takarítás</option>
+          <option>🛒 Bevásárlás</option>
+          <option>🏠 Karbantartás</option>
+          <option>💼 Egyéb</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="saveTask()">Mentés</button>
+    <button class="btn btn-outline btn-block" onclick="closeModal('modal-task')">Mégse</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-clean">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Takarítási feladat</div>
+    <div class="form-group">
+      <label class="form-label">Feladat</label>
+      <input class="form-input" id="clean-name" type="text" placeholder="pl. Fürdőszoba súrolás">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Felelős</label>
+      <select class="form-select" id="clean-member"></select>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Dátum</label>
+        <input class="form-input" id="clean-date" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Ismétlés</label>
+        <select class="form-select" id="clean-repeat">
+          <option value="">Egyszer</option>
+          <option value="weekly">Hetente</option>
+          <option value="biweekly">2 hetente</option>
+          <option value="monthly">Havonta</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="saveClean()">Mentés</button>
+    <button class="btn btn-outline btn-block" onclick="closeModal('modal-clean')">Mégse</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-plant">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Új virág 🌿</div>
+    <div class="form-group">
+      <label class="form-label">Virág neve</label>
+      <input class="form-input" id="plant-name-input" type="text" placeholder="pl. Orchidea">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Ikon</label>
+        <select class="form-select" id="plant-icon">
+          <option>🌸</option><option>🌺</option><option>🌻</option>
+          <option>🌹</option><option>🌿</option><option>🍀</option>
+          <option>🎍</option><option>🪴</option><option>🌵</option><option>🌴</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Öntözés naponta</label>
+        <input class="form-input" id="plant-days" type="number" value="7" min="1" inputmode="numeric">
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="savePlant()">Mentés</button>
+    <button class="btn btn-outline btn-block" onclick="closeModal('modal-plant')">Mégse</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-members">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Háztartás tagjai 👨‍👩‍👧</div>
+    <div id="members-list" style="margin-bottom:16px"></div>
+    <div style="display:flex;gap:8px">
+      <input class="form-input" style="flex:1" id="new-member-name" type="text" placeholder="Név (pl. Anya)">
+      <button class="btn btn-primary" onclick="addMember()">+</button>
+    </div>
+    <button class="btn btn-outline btn-block" style="margin-top:10px" onclick="closeModal('modal-members')">Kész</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- SETTINGS FAB -->
+<button class="btn-icon" style="position:fixed;top:52px;right:16px;z-index:99;background:var(--surface);box-shadow:var(--shadow)" onclick="openModal('modal-members')">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+</button>
+
+<script>
+// ============ STATE ============
+let state = JSON.parse(localStorage.getItem('otthon_v2') || 'null') || {
+  members: ['Anya','Apa','Gyerek'],
+  savings: 0, savingsGoal: 100000, savingsHistory: [],
+  shopItems: [],
+  tasks: [],
+  cleanTasks: [],
+  plants: [],
+  bottles: [], bottleRedeemed: 0
+};
+const COLORS = ['#534AB7','#0F6E56','#A32D2D','#854F0B','#185FA5','#3B6D11'];
+const CBGS = ['#EEEDFE','#E1F5EE','#FCEBEB','#FAEEDA','#E6F1FB','#EAF3DE'];
+
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+let selectedCalDate = todayStr();
+let shopFilter = 'all';
+let taskMemberFilter = 'all';
+let cleanMemberFilter = 'all';
+
+function save() { localStorage.setItem('otthon_v2', JSON.stringify(state)); }
+function todayStr() { return new Date().toISOString().split('T')[0]; }
+function fmtFt(n) { return n.toLocaleString('hu-HU') + ' Ft'; }
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2000);
+}
+
+// ============ NAV ============
+const screens = ['home','penz','bevasarlas','feladatok','takaritas','virag','uveg'];
+function showScreen(id) {
+  screens.forEach(s => {
+    document.getElementById('screen-'+s).classList.remove('active');
+  });
+  document.getElementById('screen-'+id).classList.add('active');
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.remove('active'));
+  const idx = screens.indexOf(id);
+  if(idx >= 0) document.querySelectorAll('.tab')[idx].classList.add('active');
+  if(id==='home') renderHome();
+  if(id==='feladatok') renderCalendar();
+  if(id==='takaritas') renderClean();
+  if(id==='virag') renderPlants();
+  if(id==='uveg') renderBottles();
+  if(id==='bevasarlas') renderShop();
+  if(id==='penz') renderSavings();
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if(e.target===o) o.classList.remove('open'); });
+});
+
+// ============ HOME ============
+function renderHome() {
+  document.getElementById('home-date').textContent = new Date().toLocaleDateString('hu-HU',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  // savings
+  document.getElementById('home-savings').textContent = fmtFt(state.savings);
+  document.getElementById('home-savings-badge').textContent = fmtFt(state.savings);
+  const pct = Math.min(100, (state.savings/state.savingsGoal)*100);
+  document.getElementById('home-savings-bar').style.width = pct+'%';
+  document.getElementById('home-savings-goal').textContent = 'Cél: ' + fmtFt(state.savingsGoal);
+  // tasks today
+  const today = todayStr();
+  const todayTasks = state.tasks.filter(t => t.date===today && !t.done);
+  document.getElementById('home-tasks-badge').textContent = todayTasks.length + ' db';
+  const tl = document.getElementById('home-tasks-list');
+  if(todayTasks.length===0) { tl.innerHTML='<p style="color:var(--text3);font-size:13px">Nincs mai feladat 🎉</p>'; }
+  else { tl.innerHTML = todayTasks.slice(0,3).map(t=>`<div class="list-item" style="padding:8px 0"><span style="font-size:20px">${t.cat.split(' ')[0]}</span><span style="font-size:14px;flex:1">${t.name}</span><span style="font-size:12px;color:var(--text3)">${t.member}</span></div>`).join(''); }
+  // plants
+  const needWater = state.plants.filter(p => daysSinceWater(p) >= p.days);
+  document.getElementById('home-plants-badge').textContent = needWater.length + ' öntözendő';
+  document.getElementById('home-plants-preview').textContent = needWater.length===0 ? 'Minden virág öntözve ✓' : needWater.map(p=>p.icon+' '+p.name).join(', ');
+  // bottles
+  const bottleCount = state.bottles.reduce((s,b)=>s+b.qty,0);
+  const bottleVal = state.bottles.reduce((s,b)=>s+b.qty*b.price,0);
+  document.getElementById('home-bottles-badge').textContent = bottleCount + ' db';
+  document.getElementById('home-bottles-val').textContent = fmtFt(bottleVal) + ' várható visszaváltás';
+}
+
+// ============ PÉNZ ============
+function renderSavings() {
+  document.getElementById('total-savings').textContent = fmtFt(state.savings);
+  const pct = Math.min(100,(state.savings/state.savingsGoal)*100);
+  document.getElementById('savings-bar').style.width = pct+'%';
+  document.getElementById('savings-goal-label').textContent = fmtFt(state.savingsGoal);
+  document.getElementById('savings-remaining').textContent = fmtFt(Math.max(0,state.savingsGoal-state.savings));
+  document.getElementById('savings-goal-input').value = state.savingsGoal;
+  const hist = document.getElementById('savings-history');
+  if(state.savingsHistory.length===0) { hist.innerHTML='<p style="color:var(--text3);font-size:13px">Még nincs tranzakció</p>'; return; }
+  hist.innerHTML = state.savingsHistory.slice().reverse().slice(0,20).map(t=>`
+    <div class="list-item">
+      <span style="font-size:20px">${t.amount>0?'💚':'🔴'}</span>
+      <div class="item-body"><div class="item-title">${t.note||'Tranzakció'}</div><div class="item-sub">${t.date}</div></div>
+      <span style="font-weight:500;color:${t.amount>0?'var(--green)':'var(--red)'}">${t.amount>0?'+':''}${fmtFt(t.amount)}</span>
+    </div>`).join('');
+}
+function addSaving(dir) {
+  const amt = parseInt(document.getElementById('savings-amount').value)||0;
+  const note = document.getElementById('savings-note').value||'';
+  if(!amt) { toast('Add meg az összeget!'); return; }
+  const change = dir * amt;
+  state.savings = Math.max(0, state.savings + change);
+  state.savingsHistory.push({amount:change, note, date:new Date().toLocaleDateString('hu-HU')});
+  save(); renderSavings(); renderHome();
+  document.getElementById('savings-amount').value='';
+  document.getElementById('savings-note').value='';
+  toast(dir>0 ? '💚 Hozzáadva!' : '🔴 Kivéve!');
+}
+function setSavingsGoal() {
+  const g = parseInt(document.getElementById('savings-goal-input').value)||100000;
+  state.savingsGoal = g; save(); renderSavings(); toast('Cél beállítva!');
+}
+
+// ============ BEVÁSÁRLÁS ============
+function renderShop() {
+  let items = state.shopItems;
+  if(shopFilter==='active') items = items.filter(i=>!i.done);
+  if(shopFilter==='done') items = items.filter(i=>i.done);
+  document.getElementById('shop-count').textContent = state.shopItems.filter(i=>!i.done).length + ' aktív tétel';
+  const el = document.getElementById('shop-list');
+  if(items.length===0) { el.innerHTML='<p style="color:var(--text3);font-size:13px;padding:12px 0">Lista üres</p>'; return; }
+  el.innerHTML = items.map((it,i)=>{
+    const ri = state.shopItems.indexOf(it);
+    return `<div class="list-item">
+      <button class="check-btn ${it.done?'checked':''}" onclick="toggleShop(${ri})">${it.done?'✓':''}</button>
+      <div class="item-body">
+        <div class="item-title ${it.done?'done':''}">${it.name}</div>
+        <div class="item-sub">${it.qty}</div>
+      </div>
+      <button class="btn-icon" onclick="deleteShop(${ri})" style="background:var(--red-bg);color:var(--red)">✕</button>
+    </div>`;
+  }).join('');
+}
+function addShopItem() {
+  const n = document.getElementById('shop-input').value.trim();
+  const q = document.getElementById('shop-qty').value.trim()||'1 db';
+  if(!n) return;
+  state.shopItems.push({name:n,qty:q,done:false});
+  save(); renderShop();
+  document.getElementById('shop-input').value='';
+  document.getElementById('shop-qty').value='1 db';
+}
+function toggleShop(i) { state.shopItems[i].done=!state.shopItems[i].done; save(); renderShop(); }
+function deleteShop(i) { state.shopItems.splice(i,1); save(); renderShop(); }
+function clearDoneShop() { state.shopItems=state.shopItems.filter(i=>!i.done); save(); renderShop(); toast('Kész elemek törölve!'); }
+function filterShop(f,el) {
+  shopFilter=f;
+  document.querySelectorAll('.chip').forEach(c=>{ if(c.closest('#screen-bevasarlas')) { c.classList.add('inactive'); c.classList.remove('active'); } });
+  el.classList.remove('inactive'); el.classList.add('active');
+  renderShop();
+}
+
+// ============ NAPTÁR ============
+function renderCalendar() {
+  renderMemberFilter('member-filter','taskMemberFilter', ()=>renderTaskList());
+  const months = ['Január','Február','Március','Április','Május','Június','Július','Augusztus','Szeptember','Október','November','December'];
+  document.getElementById('cal-title').textContent = calYear+'. '+months[calMonth];
+  const names = ['H','K','Sz','Cs','P','Sz','V'];
+  document.getElementById('cal-names').innerHTML = names.map(n=>`<div class="cal-day-name">${n}</div>`).join('');
+  const first = new Date(calYear,calMonth,1);
+  let startDay = first.getDay()-1; if(startDay<0)startDay=6;
+  const daysInMonth = new Date(calYear,calMonth+1,0).getDate();
+  const today = new Date();
+  const taskDates = new Set(state.tasks.map(t=>t.date));
+  let html='';
+  for(let i=0;i<startDay;i++) {
+    const d = new Date(calYear,calMonth,1-startDay+i);
+    html+=`<div class="cal-day other-month">${d.getDate()}</div>`;
+  }
+  for(let d=1;d<=daysInMonth;d++) {
+    const ds = calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const isToday = today.getFullYear()===calYear&&today.getMonth()===calMonth&&today.getDate()===d;
+    const isSel = ds===selectedCalDate;
+    const hasEv = taskDates.has(ds);
+    html+=`<div class="cal-day ${isToday?'today':''} ${isSel&&!isToday?'selected':''} ${hasEv?'has-event':''}" onclick="selectDay('${ds}')">${d}</div>`;
+  }
+  document.getElementById('cal-days').innerHTML=html;
+  renderTaskList();
+}
+function calNav(dir) { calMonth+=dir; if(calMonth>11){calMonth=0;calYear++;} if(calMonth<0){calMonth=11;calYear--;} renderCalendar(); }
+function selectDay(ds) { selectedCalDate=ds; renderCalendar(); }
+
+function renderTaskList() {
+  const tasks = state.tasks.filter(t => {
+    if(taskMemberFilter!=='all' && t.member!==taskMemberFilter) return false;
+    return true;
+  }).sort((a,b)=>a.date.localeCompare(b.date));
+  const el = document.getElementById('task-list');
+  if(tasks.length===0) { el.innerHTML='<p style="color:var(--text3);font-size:13px;padding:12px 0">Nincs feladat</p>'; return; }
+  // group by date
+  const grouped = {};
+  tasks.forEach(t => { if(!grouped[t.date]) grouped[t.date]=[]; grouped[t.date].push(t); });
+  const today=todayStr();
+  el.innerHTML = Object.entries(grouped).map(([date,ts])=>`
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">${date===today?'Ma — '+date:date}</div>
+      ${ts.map(t=>{
+        const mi=state.members.indexOf(t.member);
+        const bg=mi>=0?CBGS[mi%CBGS.length]:'#eee';
+        const col=mi>=0?COLORS[mi%COLORS.length]:'#666';
+        return `<div class="card" style="padding:12px;margin-bottom:8px;opacity:${t.done?0.6:1}">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:22px">${t.cat.split(' ')[0]}</span>
+            <div style="flex:1">
+              <div style="font-size:15px;font-weight:400;${t.done?'text-decoration:line-through;color:var(--text3)':''}">${t.name}</div>
+              <div style="font-size:12px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:6px">
+                <span style="background:${bg};color:${col};padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500">${t.member}</span>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="check-btn ${t.done?'checked':''}" onclick="toggleTask('${t.id}')">${t.done?'✓':''}</button>
+              <button class="btn-icon" onclick="deleteTask('${t.id}')" style="background:var(--red-bg);color:var(--red);width:28px;height:28px;font-size:13px">✕</button>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`).join('');
+}
+
+function openTaskModal() {
+  document.getElementById('task-date').value=selectedCalDate||todayStr();
+  const sel=document.getElementById('task-member');
+  sel.innerHTML=state.members.map(m=>`<option>${m}</option>`).join('');
+  openModal('modal-task');
+}
+function saveTask() {
+  const n=document.getElementById('task-name').value.trim();
+  if(!n){toast('Adj meg egy feladat nevet!');return;}
+  state.tasks.push({id:Date.now().toString(),name:n,member:document.getElementById('task-member').value,date:document.getElementById('task-date').value,cat:document.getElementById('task-cat').value,done:false});
+  save(); closeModal('modal-task'); renderCalendar(); toast('✓ Feladat hozzáadva!');
+  document.getElementById('task-name').value='';
+}
+function toggleTask(id) { const t=state.tasks.find(t=>t.id===id); if(t){t.done=!t.done;save();renderCalendar();renderHome();toast(t.done?'✅ Kész!':'↩️ Visszavéve');} }
+function deleteTask(id) { state.tasks=state.tasks.filter(t=>t.id!==id); save(); renderCalendar(); }
+
+// ============ TAKARÍTÁS ============
+function renderClean() {
+  renderMemberFilter('clean-member-filter','cleanMemberFilter', ()=>renderCleanList());
+  renderCleanList();
+}
+function renderCleanList() {
+  let tasks=state.cleanTasks.filter(t=>cleanMemberFilter==='all'||t.member===cleanMemberFilter);
+  const el=document.getElementById('clean-list');
+  if(tasks.length===0){el.innerHTML='<p style="color:var(--text3);font-size:13px;padding:12px 0">Nincs takarítási feladat</p>';return;}
+  el.innerHTML=tasks.map(t=>{
+    const mi=state.members.indexOf(t.member);
+    const bg=mi>=0?CBGS[mi%CBGS.length]:'#eee';
+    const col=mi>=0?COLORS[mi%COLORS.length]:'#666';
+    const rep={weekly:'Hetente',biweekly:'2 hetente',monthly:'Havonta','':'Egyszer'};
+    return `<div class="card" style="padding:12px;margin-bottom:8px;opacity:${t.done?0.55:1}">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:22px">🧹</span>
+        <div style="flex:1">
+          <div style="font-size:15px;font-weight:400;${t.done?'text-decoration:line-through;color:var(--text3)':''}">${t.name}</div>
+          <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+            <span style="background:${bg};color:${col};padding:2px 8px;border-radius:10px;font-size:11px;font-weight:500">${t.member}</span>
+            <span style="font-size:11px;color:var(--text3)">${t.date}</span>
+            ${t.repeat?`<span class="badge badge-blue" style="font-size:10px">${rep[t.repeat]}</span>`:''}
+          </div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="check-btn ${t.done?'checked':''}" onclick="toggleClean('${t.id}')">${t.done?'✓':''}</button>
+          <button class="btn-icon" onclick="deleteClean('${t.id}')" style="background:var(--red-bg);color:var(--red);width:28px;height:28px;font-size:13px">✕</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openCleanModal() {
+  document.getElementById('clean-date').value=todayStr();
+  const sel=document.getElementById('clean-member');
+  sel.innerHTML=state.members.map(m=>`<option>${m}</option>`).join('');
+  openModal('modal-clean');
+}
+function saveClean() {
+  const n=document.getElementById('clean-name').value.trim();
+  if(!n){toast('Adj meg egy feladat nevet!');return;}
+  state.cleanTasks.push({id:Date.now().toString(),name:n,member:document.getElementById('clean-member').value,date:document.getElementById('clean-date').value,repeat:document.getElementById('clean-repeat').value,done:false});
+  save(); closeModal('modal-clean'); renderClean(); toast('✓ Feladat hozzáadva!');
+  document.getElementById('clean-name').value='';
+}
+function toggleClean(id){const t=state.cleanTasks.find(t=>t.id===id);if(t){t.done=!t.done;save();renderClean();toast(t.done?'✅ Kész!':'↩️ Visszavéve');}}
+function deleteClean(id){state.cleanTasks=state.cleanTasks.filter(t=>t.id!==id);save();renderClean();}
+
+// ============ VIRÁG ============
+function daysSinceWater(p) {
+  if(!p.lastWatered) return 999;
+  const diff=(new Date()-new Date(p.lastWatered))/(1000*60*60*24);
+  return Math.floor(diff);
+}
+function renderPlants() {
+  const el=document.getElementById('plant-list');
+  if(state.plants.length===0){el.innerHTML='<p style="color:var(--text3);font-size:13px;padding:12px 0">Még nincs virág hozzáadva</p>';return;}
+  el.innerHTML=state.plants.map((p,i)=>{
+    const days=daysSinceWater(p);
+    const overdue=days>=p.days;
+    const nextIn=Math.max(0,p.days-days);
+    return `<div class="plant-card ${overdue?'plant-overdue':''}">
+      <span class="plant-icon">${p.icon}</span>
+      <div class="plant-body">
+        <div class="plant-name">${p.name}</div>
+        <div class="plant-next">${overdue?'⚠️ Öntözés szükséges!':'Következő öntözés: '+nextIn+' nap múlva'}</div>
+        <div style="font-size:11px;opacity:0.7;margin-top:2px">Ciklus: ${p.days} naponta • ${p.lastWatered?'Utoljára: '+new Date(p.lastWatered).toLocaleDateString('hu-HU'):'Még nem öntözve'}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:center">
+        <button class="plant-water-btn" onclick="waterPlant(${i})">💧 Öntöztem</button>
+        <button onclick="deletePlant(${i})" style="font-size:11px;background:none;border:none;color:var(--text3);cursor:pointer">Törlés</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function waterPlant(i){state.plants[i].lastWatered=new Date().toISOString();save();renderPlants();renderHome();toast('💧 '+state.plants[i].name+' megöntözve!');}
+function deletePlant(i){state.plants.splice(i,1);save();renderPlants();}
+function openPlantModal(){openModal('modal-plant');}
+function savePlant(){
+  const n=document.getElementById('plant-name-input').value.trim();
+  if(!n){toast('Adj meg egy nevet!');return;}
+  state.plants.push({name:n,icon:document.getElementById('plant-icon').value,days:parseInt(document.getElementById('plant-days').value)||7,lastWatered:null});
+  save();closeModal('modal-plant');renderPlants();toast('🌿 Virág hozzáadva!');
+  document.getElementById('plant-name-input').value='';
+}
+
+// ============ ÜVEG ============
+function renderBottles(){
+  const count=state.bottles.reduce((s,b)=>s+b.qty,0);
+  const val=state.bottles.reduce((s,b)=>s+b.qty*b.price,0);
+  document.getElementById('bottle-total-val').textContent=fmtFt(val);
+  document.getElementById('bottle-count-label').textContent=count+' db üveg';
+  document.getElementById('bottle-redeemed').textContent=fmtFt(state.bottleRedeemed);
+  const el=document.getElementById('bottle-list');
+  if(state.bottles.length===0){el.innerHTML='<p style="color:var(--text3);font-size:13px">Nincs visszaváltandó</p>';return;}
+  const names={50:'Kis üveg / Kanna',100:'Nagy üveg',30:'Műanyag'};
+  el.innerHTML=state.bottles.map((b,i)=>`
+    <div class="list-item">
+      <span style="font-size:22px">🍾</span>
+      <div class="item-body">
+        <div class="item-title">${names[b.price]||'Üveg'}</div>
+        <div class="item-sub">${b.qty} db × ${b.price} Ft = ${fmtFt(b.qty*b.price)}</div>
+      </div>
+      <button class="btn-icon" onclick="deleteBottle(${i})" style="background:var(--red-bg);color:var(--red)">✕</button>
+    </div>`).join('');
+}
+function addBottles(){
+  const price=parseInt(document.getElementById('bottle-type').value)||50;
+  const qty=parseInt(document.getElementById('bottle-qty').value)||1;
+  state.bottles.push({qty,price,date:todayStr()});
+  save();renderBottles();renderHome();toast('🍾 '+qty+' db hozzáadva!');
+}
+function deleteBottle(i){state.bottles.splice(i,1);save();renderBottles();}
+function redeemAll(){
+  const val=state.bottles.reduce((s,b)=>s+b.qty*b.price,0);
+  state.bottleRedeemed+=val;
+  state.savings+=val;
+  state.savingsHistory.push({amount:val,note:'Üveg visszaváltás',date:new Date().toLocaleDateString('hu-HU')});
+  state.bottles=[];
+  save();renderBottles();renderHome();toast('🎉 '+fmtFt(val)+' visszaváltva!');
+}
+
+// ============ TAGOK ============
+function renderMemberFilter(containerId, varName, callback) {
+  const el=document.getElementById(containerId);
+  const current = varName==='taskMemberFilter'?taskMemberFilter:cleanMemberFilter;
+  el.innerHTML=`<span class="chip ${current==='all'?'active':'inactive'}" onclick="setMemberFilter('${varName}','all','${containerId}',${callback.toString()})">Mind</span>`
+    +state.members.map(m=>`<span class="chip ${current===m?'active':'inactive'}" onclick="setMemberFilter('${varName}','${m}','${containerId}',${callback.toString()})">${m}</span>`).join('');
+}
+function setMemberFilter(varName, val, containerId, cb){
+  if(varName==='taskMemberFilter') taskMemberFilter=val;
+  else cleanMemberFilter=val;
+  if(varName==='taskMemberFilter') renderMemberFilter(containerId,'taskMemberFilter',()=>renderTaskList());
+  else renderMemberFilter(containerId,'cleanMemberFilter',()=>renderCleanList());
+  if(varName==='taskMemberFilter') renderTaskList();
+  else renderCleanList();
+}
+
+function renderMembersList(){
+  const el=document.getElementById('members-list');
+  el.innerHTML=state.members.map((m,i)=>{
+    const col=COLORS[i%COLORS.length];const bg=CBGS[i%CBGS.length];
+    return `<div class="list-item"><div class="avatar" style="background:${bg};color:${col}">${m[0]}</div><div class="item-body"><div class="item-title">${m}</div></div><button class="btn-icon" onclick="deleteMember(${i})" style="background:var(--red-bg);color:var(--red)">✕</button></div>`;
+  }).join('');
+}
+function addMember(){
+  const n=document.getElementById('new-member-name').value.trim();
+  if(!n){toast('Adj meg egy nevet!');return;}
+  if(state.members.includes(n)){toast('Ez a tag már szerepel!');return;}
+  state.members.push(n);save();renderMembersList();
+  document.getElementById('new-member-name').value='';
+  toast('👤 '+n+' hozzáadva!');
+}
+function deleteMember(i){state.members.splice(i,1);save();renderMembersList();}
+document.getElementById('modal-members').querySelector('.modal').addEventListener('click',()=>renderMembersList());
+
+// ============ INIT ============
+renderHome();
+</script>
+</body>
+</html>
