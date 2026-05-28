@@ -238,7 +238,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       </div>
     </div>
 
-    <div class="form-row" style="margin-bottom:12px">
+    <div class="form-row" style="margin-bottom:10px">
       <div>
         <label class="form-label">Összeg (Ft)</label>
         <input class="form-input" type="number" id="savings-amount" placeholder="pl. 5000" inputmode="numeric">
@@ -247,6 +247,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
         <label class="form-label">Megjegyzés</label>
         <input class="form-input" type="text" id="savings-note" placeholder="pl. Ebéd">
       </div>
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label class="form-label">Dátum</label>
+      <input class="form-input" type="date" id="savings-date">
     </div>
     <div class="form-row" style="margin-bottom:14px">
       <button class="btn btn-primary" onclick="addSaving(1)" style="width:100%;justify-content:center">+ Hozzáadom</button>
@@ -616,6 +620,7 @@ function renderHome() {
 
 // ============ PÉNZ ============
 function renderSavings() {
+  document.getElementById('savings-date').value = todayStr();
   document.getElementById('total-savings').textContent = fmtFt(state.savings);
   const pct = Math.min(100,(state.savings/state.savingsGoal)*100);
   document.getElementById('savings-bar').style.width = pct+'%';
@@ -634,10 +639,12 @@ function renderSavings() {
 function addSaving(dir) {
   const amt = parseInt(document.getElementById('savings-amount').value)||0;
   const note = document.getElementById('savings-note').value||'';
+  const dateVal = document.getElementById('savings-date').value;
   if(!amt) { toast('Add meg az összeget!'); return; }
   const change = dir * amt;
   state.savings = Math.max(0, state.savings + change);
-  state.savingsHistory.push({amount:change, note, date:new Date().toLocaleDateString('hu-HU')});
+  const dateLabel = dateVal ? new Date(dateVal).toLocaleDateString('hu-HU') : new Date().toLocaleDateString('hu-HU');
+  state.savingsHistory.push({amount:change, note, date:dateLabel});
   save(); renderSavings(); renderHome();
   document.getElementById('savings-amount').value='';
   document.getElementById('savings-note').value='';
